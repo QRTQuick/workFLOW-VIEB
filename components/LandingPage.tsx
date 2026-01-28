@@ -6,8 +6,8 @@ interface LandingPageProps {
   onShowDocs: () => void;
 }
 
-// REPLACE THIS with your Client ID from Google Cloud Console
-const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+// Accessing the Client ID from the environment variable as requested
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "584831158345-68k0sfa8u7m5hqja1c2r1elj0ror15js.apps.googleusercontent.com";
 
 const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
   
@@ -18,7 +18,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
       google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (response: any) => {
-          console.log("Encoded JWT ID token: " + response.credential);
+          console.log("Encoded JWT ID token received");
           onLogin();
         },
       });
@@ -27,17 +27,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
 
   const handleGoogleLogin = () => {
     const google = (window as any).google;
-    if (GOOGLE_CLIENT_ID.startsWith("YOUR_")) {
+    if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes("YOUR_")) {
+      // Fallback for demo if ID isn't set
       onLogin();
     } else {
-      google?.accounts?.id.prompt();
+      try {
+        google?.accounts?.id.prompt();
+      } catch (e) {
+        onLogin(); // Fallback to guest if prompt fails
+      }
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500 selection:text-white flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500 selection:text-white flex flex-col overflow-y-auto">
       {/* Navigation */}
-      <nav className="p-8 flex justify-between items-center max-w-7xl mx-auto w-full">
+      <nav className="p-8 flex justify-between items-center max-w-7xl mx-auto w-full shrink-0">
         <div className="flex items-center gap-2">
           <div className="bg-indigo-600 p-2 rounded-xl text-white font-bold text-xl">WV</div>
           <span className="text-xl font-bold tracking-tight">workFLOW VIEB</span>
@@ -59,12 +64,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
       </nav>
 
       {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
+      <main className="flex-1 flex flex-col items-center justify-center p-8 text-center relative py-24">
         {/* Background Gradients */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-indigo-600/20 blur-[120px] rounded-full -z-10"></div>
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-emerald-600/10 blur-[120px] rounded-full -z-10"></div>
 
-        <div className="max-w-4xl space-y-8">
+        <div className="max-w-4xl space-y-8 z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-[10px] font-bold uppercase tracking-widest text-indigo-400">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
@@ -107,7 +112,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
             <div className="w-3 h-3 rounded-full bg-amber-500/50 group-hover:bg-amber-500 transition-colors"></div>
             <div className="w-3 h-3 rounded-full bg-emerald-500/50 group-hover:bg-emerald-500 transition-colors"></div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="h-40 bg-slate-800/30 rounded-xl border border-white/5 flex flex-col items-center justify-center">
                <div className="w-12 h-2 bg-indigo-500/20 rounded-full mb-2"></div>
                <div className="w-20 h-2 bg-slate-700 rounded-full"></div>
@@ -124,7 +129,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
         </div>
       </main>
 
-      <footer className="p-12 text-center text-slate-500 text-sm border-t border-slate-900 mt-auto">
+      <footer className="p-12 text-center text-slate-500 text-sm border-t border-slate-900 mt-auto shrink-0">
         &copy; 2024 workFLOW VIEB. Secured with Industry Standard Encryption.
       </footer>
     </div>

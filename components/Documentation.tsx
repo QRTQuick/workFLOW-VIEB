@@ -20,9 +20,9 @@ const Documentation: React.FC<DocumentationProps> = ({ onBack, onGetStarted }) =
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 flex flex-col">
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col overflow-y-auto">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 h-16 flex items-center justify-between px-8">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 h-16 flex items-center justify-between px-8 shrink-0">
         <div className="flex items-center gap-2">
           <div className="bg-indigo-600 p-1.5 rounded-lg text-white font-bold text-sm">WV</div>
           <span className="font-bold tracking-tight">Documentation</span>
@@ -45,7 +45,7 @@ const Documentation: React.FC<DocumentationProps> = ({ onBack, onGetStarted }) =
 
       <div className="flex-1 flex max-w-7xl mx-auto w-full">
         {/* Sidebar */}
-        <aside className="w-64 border-r border-slate-100 hidden md:block sticky top-16 h-[calc(100vh-64px)] overflow-y-auto p-8">
+        <aside className="w-64 border-r border-slate-100 hidden md:block sticky top-16 h-[calc(100vh-64px)] overflow-y-auto p-8 shrink-0">
           <nav className="space-y-1">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Navigation</p>
             {sections.map((section) => (
@@ -87,7 +87,7 @@ const Documentation: React.FC<DocumentationProps> = ({ onBack, onGetStarted }) =
                 <p className="text-slate-600 leading-relaxed mb-4">
                   The atomic unit of workFLOW VIEB. Each node represents a specific stage in your pipeline.
                 </p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 bg-amber-50 rounded-xl border border-amber-100">
                     <span className="text-[10px] font-bold text-amber-700 uppercase">Planning</span>
                     <p className="text-xs text-amber-600 mt-1">Research, wireframes, and specs.</p>
@@ -115,7 +115,7 @@ const Documentation: React.FC<DocumentationProps> = ({ onBack, onGetStarted }) =
             <p className="text-slate-600 leading-relaxed mb-6">
               Our integration with <strong>Google Gemini 3.0</strong> allows you to generate optimized workflows from natural language descriptions.
             </p>
-            <div className="bg-slate-900 rounded-2xl p-6 text-indigo-300 font-mono text-xs">
+            <div className="bg-slate-900 rounded-2xl p-6 text-indigo-300 font-mono text-xs overflow-x-auto">
               <p className="mb-2 opacity-50">// Prompt Example</p>
               <p>"Build a scalable microservices architecture for a fintech app..."</p>
               <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
@@ -152,7 +152,7 @@ const Documentation: React.FC<DocumentationProps> = ({ onBack, onGetStarted }) =
             </p>
           </section>
 
-          <div className="mt-32 p-12 bg-indigo-600 rounded-3xl text-center text-white">
+          <div className="mt-32 p-12 bg-indigo-600 rounded-3xl text-center text-white mb-20">
             <h3 className="text-2xl font-bold mb-4">Ready to accelerate?</h3>
             <p className="mb-8 opacity-80">Join 50,000+ developers using workFLOW VIEB every day.</p>
             <button 
@@ -165,7 +165,7 @@ const Documentation: React.FC<DocumentationProps> = ({ onBack, onGetStarted }) =
         </main>
       </div>
 
-      <footer className="p-12 text-center text-slate-400 text-sm border-t border-slate-50">
+      <footer className="p-12 text-center text-slate-400 text-sm border-t border-slate-50 shrink-0">
         &copy; 2024 workFLOW VIEB. For further assistance, contact support@dev.flow
       </footer>
     </div>
