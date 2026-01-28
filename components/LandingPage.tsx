@@ -6,21 +6,34 @@ interface LandingPageProps {
   onShowDocs: () => void;
 }
 
-// Accessing the Client ID from the environment variable as requested
+/**
+ * SOURCE: User-provided Google Client ID.
+ * We prioritize process.env.GOOGLE_CLIENT_ID to avoid hardcoding.
+ */
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "584831158345-68k0sfa8u7m5hqja1c2r1elj0ror15js.apps.googleusercontent.com";
 
 const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
   
   useEffect(() => {
-    /* Initialize Google Sign-In if library is loaded */
+    /* Initialize Google Sign-In with FedCM opt-in to prevent NotAllowedError in modern browsers */
     const google = (window as any).google;
     if (google?.accounts?.id) {
       google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (response: any) => {
-          console.log("Encoded JWT ID token received");
+          console.debug("Google Identity: Credential received");
+          // In a real app, you'd decode the JWT here
           onLogin();
         },
+        use_fedcm_for_prompt: true, // Resolves FedCM mandatory warning
+        auto_select: false,
+      });
+
+      // Optionally attempt to display One Tap
+      google.accounts.id.prompt((notification: any) => {
+        if (notification.isNotDisplayed()) {
+          console.debug("One Tap not displayed:", notification.getNotDisplayedReason());
+        }
       });
     }
   }, [onLogin]);
@@ -28,21 +41,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
   const handleGoogleLogin = () => {
     const google = (window as any).google;
     if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes("YOUR_")) {
-      // Fallback for demo if ID isn't set
-      onLogin();
+      onLogin(); // Dev Fallback
     } else {
       try {
+        // Use standard prompt for explicit login
         google?.accounts?.id.prompt();
       } catch (e) {
-        onLogin(); // Fallback to guest if prompt fails
+        console.error("Google Login Error:", e);
+        onLogin(); // Resilience fallback
       }
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500 selection:text-white flex flex-col overflow-y-auto">
+    <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500 selection:text-white flex flex-col">
       {/* Navigation */}
-      <nav className="p-8 flex justify-between items-center max-w-7xl mx-auto w-full shrink-0">
+      <nav className="p-8 flex justify-between items-center max-w-7xl mx-auto w-full shrink-0 relative z-50">
         <div className="flex items-center gap-2">
           <div className="bg-indigo-600 p-2 rounded-xl text-white font-bold text-xl">WV</div>
           <span className="text-xl font-bold tracking-tight">workFLOW VIEB</span>
@@ -64,7 +78,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
       </nav>
 
       {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center justify-center p-8 text-center relative py-24">
+      <main className="flex-1 flex flex-col items-center justify-center p-8 text-center relative py-24 min-h-screen">
         {/* Background Gradients */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-indigo-600/20 blur-[120px] rounded-full -z-10"></div>
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-emerald-600/10 blur-[120px] rounded-full -z-10"></div>
