@@ -1,12 +1,12 @@
-
 import React from 'react';
 import { WorkflowNode } from '../types';
 
 interface DashboardProps {
   nodes: WorkflowNode[];
+  user?: { name: string; email: string; avatar: string } | null;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ nodes }) => {
+const Dashboard: React.FC<DashboardProps> = ({ nodes, user }) => {
   const stats = {
     total: nodes.length,
     completed: nodes.filter(n => n.status === 'completed').length,
@@ -20,13 +20,13 @@ const Dashboard: React.FC<DashboardProps> = ({ nodes }) => {
     <div className="flex-1 p-8 overflow-auto bg-slate-50">
       <div className="max-w-5xl mx-auto space-y-8">
         <div>
+          {user && <h1 className="text-3xl font-bold text-slate-800 mb-2">Welcome, {user.name}!</h1>}
           <h1 className="text-2xl font-bold text-slate-800">Project Overview</h1>
           <p className="text-slate-500">Real-time metrics for your current development cycle.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {[
-            { label: 'Total Steps', value: stats.total, color: 'bg-indigo-500' },
+          {[n            { label: 'Total Steps', value: stats.total, color: 'bg-indigo-500' },
             { label: 'Completed', value: stats.completed, color: 'bg-emerald-500' },
             { label: 'Active', value: stats.inProgress, color: 'bg-blue-500' },
             { label: 'Blocked', value: stats.blocked, color: 'bg-rose-500' },
@@ -77,7 +77,7 @@ const Dashboard: React.FC<DashboardProps> = ({ nodes }) => {
                     <p className="text-sm text-slate-700">
                       <span className="font-bold">{activity.user}</span> {activity.action} <span className="font-medium italic">"{activity.target}"</span>
                     </p>
-                    <p className="text-[10px] text-slate-400 mt-0.5 uppercase">{activity.time}</p>
+                    <p className="text-[10px] text-slate-400">{activity.time}</p>
                   </div>
                 </div>
               ))}

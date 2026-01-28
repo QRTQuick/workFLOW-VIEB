@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import WorkflowCanvas from './components/WorkflowCanvas';
@@ -51,19 +50,37 @@ const App: React.FC = () => {
   const [workflowName, setWorkflowName] = useState('Global Operations API');
   const [team, setTeam] = useState<TeamMember[]>(MOCK_TEAM);
 
+  // Effect to load user from local storage on initial mount
+  useEffect(() => {
+    const cachedUser = localStorage.getItem('currentUser');
+    if (cachedUser) {
+      try {
+        const parsedUser = JSON.parse(cachedUser);
+        setUser(parsedUser);
+        setView('app'); // Set view to app if user is cached
+      } catch (e) {
+        console.error('Failed to parse cached user data', e);
+        localStorage.removeItem('currentUser');
+      }
+    }
+  }, []);
+
   const handleLogin = (userData?: { name: string; email: string; avatar: string }) => {
-    setUser(userData || {
+    const userToSet = userData || {
       name: "Alex Rivera",
       email: "alex.rivera@dev.flow",
       avatar: "AR"
-    });
+    };
+    setUser(userToSet);
     setView('app');
+    localStorage.setItem('currentUser', JSON.stringify(userToSet)); // Cache user data
   };
 
   const handleLogout = () => {
     setView('landing');
     setUser(null);
     setActiveTab('dashboard');
+    localStorage.removeItem('currentUser'); // Clear cached user data
   };
 
   const handleStatusChange = (id: string, status: WorkflowStatus) => {
@@ -119,48 +136,21 @@ const App: React.FC = () => {
     return <Documentation onBack={() => setView('landing')} onGetStarted={() => setView('landing')} />;
   }
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <Dashboard nodes={nodes} />;
-      case 'workflows':
-        return (
-          <div className="flex-1 flex overflow-hidden">
-            <WorkflowCanvas 
-              nodes={nodes} 
-              onStatusChange={handleStatusChange} 
-              onAddNode={handleAddNode}
-            />
-            <AIConsultant 
-              currentNodes={nodes} 
-              onApplyWorkflow={handleApplyWorkflow} 
-            />
-          </div>
-        );
-      case 'templates':
-        return <Templates onApply={handleApplyWorkflow} />;
-      case 'team':
-        return <Team members={team} onInvite={handleAddTeamMember} />;
-      case 'settings':
-        return <Settings workflowName={workflowName} setWorkflowName={setWorkflowName} />;
-      default:
-        return <Dashboard nodes={nodes} />;
-    }
-  };
-
   return (
-    <div className="flex h-screen bg-slate-50">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} user={user} onLogout={handleLogout} />
-      
-      <main className="flex-1 flex flex-col relative min-w-0">
-        <Header 
-          workflowName={workflowName} 
-          onSave={handleSave} 
-          onReset={handleReset} 
-        />
-        
-        {renderContent()}
-      </main>
+    <div className="min-h-screen bg-white text-slate-900 font-sans">
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout} />
+      <div className="flex flex-col flex-1 min-h-screen lg:pl-64">
+        <Header user={user} workflowName={workflowName} onSave={handleSave} onReset={handleReset} onAddNode={handleAddNode} />
+        <main className="flex-1 p-8 overflow-auto">
+          {activeTab === 'dashboard' && <Dashboard user={user} workflowName={workflowName} nodes={nodes} team={team} />} {/* Pass user prop to Dashboard */}
+          {activeTab === 'workflows' && <WorkflowCanvas nodes={nodes} setNodes={setNodes} onApplyWorkflow={handleApplyWorkflow} />}
+          {activeTab === 'ai-consultant' && <AIConsultant onApplyWorkflow={handleApplyWorkflow} />}
+          {activeTab === 'templates' && <Templates onApplyWorkflow={handleApplyWorkflow} />}
+          {activeTab === 'team' && <Team team={team} onAddMember={handleAddTeamMember} />}
+          {activeTab === 'settings' && <Settings />}
+          {activeTab === 'docs' && <Documentation onBack={() => setActiveTab('dashboard')} onGetStarted={() => setActiveTab('dashboard')} />}
+        </main>
+      </div>
     </div>
   );
 };
