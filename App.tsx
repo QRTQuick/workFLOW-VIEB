@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import WorkflowCanvas from './components/WorkflowCanvas';
@@ -9,6 +9,7 @@ import Templates from './components/Templates';
 import Team from './components/Team';
 import Settings from './components/Settings';
 import LandingPage from './components/LandingPage';
+import Documentation from './components/Documentation';
 import { WorkflowNode, WorkflowStatus, TeamMember } from './types';
 
 const INITIAL_NODES: WorkflowNode[] = [
@@ -40,26 +41,27 @@ const MOCK_TEAM: TeamMember[] = [
   { id: '2', name: 'Sarah Architect', role: 'Maintainer', avatar: 'SA', status: 'busy' },
 ];
 
+type AppView = 'landing' | 'documentation' | 'app';
+
 const App: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [view, setView] = useState<AppView>('landing');
   const [user, setUser] = useState<{name: string, email: string, avatar: string} | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [nodes, setNodes] = useState<WorkflowNode[]>(INITIAL_NODES);
   const [workflowName, setWorkflowName] = useState('Global Operations API');
   const [team, setTeam] = useState<TeamMember[]>(MOCK_TEAM);
 
-  const handleLogin = () => {
-    // Simulate Google Login
-    setUser({
+  const handleLogin = (userData?: { name: string; email: string; avatar: string }) => {
+    setUser(userData || {
       name: "Alex Rivera",
-      email: "alex.rivera@dev.com",
+      email: "alex.rivera@dev.flow",
       avatar: "AR"
     });
-    setIsLoggedIn(true);
+    setView('app');
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    setView('landing');
     setUser(null);
     setActiveTab('dashboard');
   };
@@ -109,8 +111,12 @@ const App: React.FC = () => {
     setTeam(prev => [...prev, newMember]);
   };
 
-  if (!isLoggedIn) {
-    return <LandingPage onLogin={handleLogin} />;
+  if (view === 'landing') {
+    return <LandingPage onLogin={handleLogin} onShowDocs={() => setView('documentation')} />;
+  }
+
+  if (view === 'documentation') {
+    return <Documentation onBack={() => setView('landing')} onGetStarted={() => setView('landing')} />;
   }
 
   const renderContent = () => {

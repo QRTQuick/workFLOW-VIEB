@@ -1,10 +1,11 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { WorkflowNode } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Always initialize GoogleGenAI with { apiKey: process.env.API_KEY } directly
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateWorkflowSuggestion = async (projectDescription: string): Promise<{ suggestion: string, nodes: WorkflowNode[] }> => {
+  // Using gemini-3-flash-preview for general workflow generation tasks
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `Design a software development workflow for the following project: ${projectDescription}. 
@@ -41,6 +42,7 @@ export const generateWorkflowSuggestion = async (projectDescription: string): Pr
     }
   });
 
+  // Extract generated text directly from response.text property (not a method)
   const data = JSON.parse(response.text || "{}");
   return {
     suggestion: data.suggestion || "Custom workflow generated.",
@@ -49,9 +51,11 @@ export const generateWorkflowSuggestion = async (projectDescription: string): Pr
 };
 
 export const analyzeWorkflow = async (nodes: WorkflowNode[]): Promise<string> => {
+  // Using gemini-3-pro-preview for advanced reasoning and optimization analysis
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-3-pro-preview",
     contents: `Analyze this current software development workflow and suggest improvements for efficiency and speed: ${JSON.stringify(nodes)}`,
   });
+  // Access generated content using the .text property
   return response.text || "No analysis available.";
 };

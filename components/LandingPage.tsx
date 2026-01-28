@@ -1,11 +1,39 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface LandingPageProps {
-  onLogin: () => void;
+  onLogin: (userData?: { name: string; email: string; avatar: string }) => void;
+  onShowDocs: () => void;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
+// REPLACE THIS with your Client ID from Google Cloud Console
+const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+
+const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
+  
+  useEffect(() => {
+    /* Initialize Google Sign-In if library is loaded */
+    const google = (window as any).google;
+    if (google?.accounts?.id) {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (response: any) => {
+          console.log("Encoded JWT ID token: " + response.credential);
+          onLogin();
+        },
+      });
+    }
+  }, [onLogin]);
+
+  const handleGoogleLogin = () => {
+    const google = (window as any).google;
+    if (GOOGLE_CLIENT_ID.startsWith("YOUR_")) {
+      onLogin();
+    } else {
+      google?.accounts?.id.prompt();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500 selection:text-white flex flex-col">
       {/* Navigation */}
@@ -15,12 +43,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
           <span className="text-xl font-bold tracking-tight">workFLOW VIEB</span>
         </div>
         <div className="flex items-center gap-8">
-          <a href="#" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Documentation</a>
           <button 
-            onClick={onLogin}
+            onClick={onShowDocs}
+            className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
+          >
+            Documentation
+          </button>
+          <button 
+            onClick={() => onLogin()}
             className="px-6 py-2.5 bg-white text-slate-950 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors"
           >
-            Log In
+            Guest Access
           </button>
         </div>
       </nav>
@@ -37,53 +70,62 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
             </span>
-            Now Powered by Gemini 3.0
+            Real-time Workflow Engine
           </div>
           
           <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-[1.1]">
-            Automate your <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Software Workflows</span>
+            Engineering at <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Light Speed</span>
           </h1>
           
           <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Design, visualize, and optimize your development pipelines with AI-driven insights. 
-            The high-end desktop experience for elite engineering teams.
+            The industry standard for visualizing software development lifecycles. 
+            Connect your team, automate your steps, and deploy with confidence.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <button 
-              onClick={onLogin}
+              onClick={() => onLogin()}
               className="w-full sm:w-auto px-10 py-4 bg-indigo-600 rounded-2xl font-bold text-lg hover:bg-indigo-700 hover:shadow-[0_0_40px_rgba(79,70,229,0.3)] transition-all active:scale-95"
             >
-              Get Started for Free
+              Launch Dashboard
             </button>
             <button 
-              onClick={onLogin}
-              className="w-full sm:w-auto px-10 py-4 bg-slate-900 border border-slate-800 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 hover:bg-slate-800 transition-all"
+              onClick={handleGoogleLogin}
+              className="w-full sm:w-auto px-10 py-4 bg-slate-900 border border-slate-800 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 hover:bg-slate-800 transition-all group"
             >
-              <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
+              <img src="https://www.google.com/favicon.ico" className="w-5 h-5 group-hover:scale-110 transition-transform" alt="Google" />
               Sign in with Google
             </button>
           </div>
         </div>
 
         {/* Mock Preview */}
-        <div className="mt-20 w-full max-w-5xl rounded-3xl border border-slate-800 bg-slate-900/50 p-4 backdrop-blur-xl shadow-2xl relative">
+        <div className="mt-20 w-full max-w-5xl rounded-3xl border border-slate-800 bg-slate-900/50 p-4 backdrop-blur-xl shadow-2xl relative group cursor-default">
           <div className="flex gap-2 mb-4">
-            <div className="w-3 h-3 rounded-full bg-rose-500"></div>
-            <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+            <div className="w-3 h-3 rounded-full bg-rose-500/50 group-hover:bg-rose-500 transition-colors"></div>
+            <div className="w-3 h-3 rounded-full bg-amber-500/50 group-hover:bg-amber-500 transition-colors"></div>
+            <div className="w-3 h-3 rounded-full bg-emerald-500/50 group-hover:bg-emerald-500 transition-colors"></div>
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <div className="h-40 bg-slate-800/50 rounded-xl animate-pulse"></div>
-            <div className="h-40 bg-slate-800/50 rounded-xl animate-pulse delay-75"></div>
-            <div className="h-40 bg-slate-800/50 rounded-xl animate-pulse delay-150"></div>
+            <div className="h-40 bg-slate-800/30 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+               <div className="w-12 h-2 bg-indigo-500/20 rounded-full mb-2"></div>
+               <div className="w-20 h-2 bg-slate-700 rounded-full"></div>
+            </div>
+            <div className="h-40 bg-slate-800/30 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+               <div className="w-12 h-2 bg-emerald-500/20 rounded-full mb-2"></div>
+               <div className="w-20 h-2 bg-slate-700 rounded-full"></div>
+            </div>
+            <div className="h-40 bg-slate-800/30 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+               <div className="w-12 h-2 bg-amber-500/20 rounded-full mb-2"></div>
+               <div className="w-20 h-2 bg-slate-700 rounded-full"></div>
+            </div>
           </div>
         </div>
       </main>
 
-      <footer className="p-12 text-center text-slate-500 text-sm border-t border-slate-900">
-        &copy; 2024 workFLOW VIEB. Built for the modern engineer.
+      <footer className="p-12 text-center text-slate-500 text-sm border-t border-slate-900 mt-auto">
+        &copy; 2024 workFLOW VIEB. Secured with Industry Standard Encryption.
       </footer>
     </div>
   );
