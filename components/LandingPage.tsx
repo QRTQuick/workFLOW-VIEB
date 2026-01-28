@@ -21,7 +21,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
       google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (response: any) => {
-<<<<<<< HEAD
           console.debug("Google Identity: Credential received", response);
           // Decode the JWT token to extract user data
           try {
@@ -36,11 +35,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onShowDocs }) => {
             console.error("Error decoding Google credential:", error);
             onLogin(); // Fallback to guest login
           }
-=======
-          console.debug("Google Identity: Credential received");
-          // In a real app, you'd decode the JWT here
-          onLogin();
->>>>>>> a77e080325021b9ffff0a8cf79f1f9905783ea60
         },
         use_fedcm_for_prompt: true, // Resolves FedCM mandatory warning
         auto_select: false,
